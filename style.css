@@ -1507,3 +1507,51 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   justify-content: flex-end;
   padding: 16px 16px 0;
 }
+
+/* ─── Instruction decoding ─── */
+
+.ix-badge.critical {
+  background: var(--red-muted);
+  color: var(--red);
+  border: 1px solid var(--red);
+}
+
+.ix-details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 16px;
+  padding: 10px 0;
+  font-size: 12px;
+}
+
+.ix-details-key { color: var(--fg-secondary); }
+.ix-details-value { font-family: var(--mono); overflow-wrap: anywhere; }
+
+.ix-anchor-hint { font-family: var(--mono); color: var(--fg-secondary); font-size: 12px; }
+
+.ix-tools {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+
+.ix-label-input {
+  flex: 1 1 180px;
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.ix-inspect-result {
+  border: 1px solid var(--fg-faint);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ix-inspect-ok { color: var(--green); }
+.ix-inspect-warn { color: var(--red); }

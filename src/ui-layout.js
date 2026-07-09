@@ -6,7 +6,9 @@ import { el, addrEl, formatSol, formatTimestamp, statusBadge, sanitize, fragment
 import { shortenAddress, toHex, getTransactionPda, encodeBase58 } from './squads.js';
 import { getState, setState, getExplorerUrl } from './state.js';
 import { resolveMultisigAddress } from './resolver.js';
-import { decodeInstruction, KNOWN_PROGRAMS } from './decode.js';
+import { decodeInstruction } from './decode.js';
+import { inspectProgram } from './program-info.js';
+import { setProgramLabel } from './program-labels.js';
 import { isValidBase58 } from './squads.js';
 import { renderModeToggle, renderOpenBanner } from './ui-lockdown.js';
 import { hasAnyPins } from './pins.js';
@@ -211,24 +213,37 @@ function renderInstruction(ix, txMessage, ixIndex) {
 
   const card = el('div', { className: 'ix-card ix-collapsed' });
 
-  // Clickable summary header
-  const knownClass = decoded.type === 'decoded' ? 'known' : (decoded.isKnown ? 'known' : 'unknown');
   const summary = el('div', { className: 'ix-summary' });
-
   const summaryLeft = el('div', { className: 'ix-summary-left' });
-  summaryLeft.appendChild(el('span', { className: `ix-badge ${knownClass}` }, decoded.type === 'decoded' ? 'Decoded' : (decoded.isKnown ? 'Known' : 'Unknown')));
+
+  let badgeClass, badgeText;
+  if (decoded.type === 'decoded' && decoded.severity === 'critical') {
+    badgeClass = 'critical'; badgeText = 'Critical';
+  } else if (decoded.type === 'decoded') {
+    badgeClass = 'known'; badgeText = 'Decoded';
+  } else if (decoded.isKnown) {
+    badgeClass = 'known'; badgeText = 'Known';
+  } else {
+    badgeClass = 'unknown'; badgeText = 'Unknown';
+  }
+  summaryLeft.appendChild(el('span', { className: `ix-badge ${badgeClass}` }, badgeText));
 
   const summaryText = el('span', { className: 'ix-summary-text' });
   if (decoded.action) {
     summaryText.appendChild(el('strong', {}, decoded.action + ': '));
-    summaryText.appendChild(el('span', {}, decoded.description));
+    summaryText.appendChild(el('span', {}, sanitize(decoded.description)));
+  } else if (decoded.anchorHint) {
+    summaryText.appendChild(el('span', { className: 'ix-anchor-hint' },
+      `anchor? ${decoded.anchorHint.discriminator} · ${decoded.anchorHint.argBytes} bytes args`));
+  } else if (decoded.description) {
+    summaryText.appendChild(el('span', {}, sanitize(decoded.description)));
   } else {
     summaryText.appendChild(el('span', {}, `Instruction ${ixIndex + 1}`));
   }
   summaryLeft.appendChild(summaryText);
   summary.appendChild(summaryLeft);
 
-  summary.appendChild(el('span', { className: 'ix-program-name' }, decoded.program));
+  summary.appendChild(el('span', { className: 'ix-program-name', title: decoded.programId }, sanitize(decoded.program)));
 
   const chevron = el('span', { className: 'ix-chevron' }, '\u25B8');
   summary.appendChild(chevron);
@@ -237,6 +252,84 @@ function renderInstruction(ix, txMessage, ixIndex) {
 
   // Expandable detail
   const detail = el('div', { className: 'ix-detail hidden' });
+
+  // Decoded fields
+  if (decoded.details) {
+    const grid = el('div', { className: 'ix-details' });
+    for (const [key, value] of Object.entries(decoded.details)) {
+      grid.appendChild(el('span', { className: 'ix-details-key' }, key));
+      const v = String(value);
+      grid.appendChild(el('span', { className: 'ix-details-value' },
+        isValidBase58(v) ? addrEl(v) : sanitize(v)));
+    }
+    detail.appendChild(grid);
+  }
+
+  // Unknown program: on-demand inspection + local label
+  if (!decoded.isKnown) {
+    const tools = el('div', { className: 'ix-tools' });
+
+    const inspectResult = el('div', { className: 'ix-inspect-result hidden' });
+    const inspectBtn = el('button', {
+      className: 'btn btn-sm',
+      onclick: async (e) => {
+        e.stopPropagation();
+        inspectBtn.disabled = true;
+        inspectBtn.textContent = 'Inspecting...';
+        try {
+          const info = await inspectProgram(getState().rpcUrl, decoded.programId);
+          inspectResult.textContent = '';
+          inspectResult.className = 'ix-inspect-result';
+          if (info.kind === 'upgradeable') {
+            inspectResult.appendChild(el('div', { className: info.upgradeAuthority ? 'ix-inspect-warn' : 'ix-inspect-ok' },
+              info.upgradeAuthority ? 'Upgradeable program' : 'Immutable program (no upgrade authority)'));
+            if (info.upgradeAuthority) {
+              inspectResult.appendChild(el('div', {}, 'Upgrade authority: ', addrEl(info.upgradeAuthority)));
+            }
+            inspectResult.appendChild(el('div', { className: 'text-muted' }, `Last deployed at slot ${info.slot}`));
+          } else if (info.kind === 'loader-v2') {
+            inspectResult.appendChild(el('div', { className: 'ix-inspect-ok' }, 'Non-upgradeable program (loader v2)'));
+          } else if (info.kind === 'not-found') {
+            inspectResult.appendChild(el('div', { className: 'ix-inspect-warn' }, 'Account not found on-chain'));
+          } else if (info.kind === 'not-program') {
+            inspectResult.appendChild(el('div', { className: 'ix-inspect-warn' }, 'Not an executable program'));
+          } else {
+            inspectResult.appendChild(el('div', {}, 'Owned by ', addrEl(info.owner)));
+          }
+        } catch (err) {
+          inspectResult.className = 'ix-inspect-result';
+          inspectResult.textContent = 'Inspection failed: ' + err.message;
+        } finally {
+          if (document.contains(inspectBtn)) {
+            inspectBtn.disabled = false;
+            inspectBtn.textContent = 'Inspect program';
+          }
+        }
+      },
+    }, 'Inspect program');
+    tools.appendChild(inspectBtn);
+
+    const labelInput = el('input', {
+      className: 'ix-label-input',
+      type: 'text',
+      maxlength: '32',
+      placeholder: 'Local label for this program...',
+      onclick: (e) => e.stopPropagation(),
+    });
+    const labelBtn = el('button', {
+      className: 'btn btn-ghost btn-sm',
+      onclick: (e) => {
+        e.stopPropagation();
+        setProgramLabel(decoded.programId, labelInput.value);
+        setState({}); // re-render; label resolution picks it up
+      },
+    }, 'Save label');
+    tools.appendChild(labelInput);
+    tools.appendChild(labelBtn);
+
+    detail.appendChild(tools);
+    detail.appendChild(inspectResult);
+  }
 
   // Accounts table
   if (ix.accountIndexes.length > 0) {
