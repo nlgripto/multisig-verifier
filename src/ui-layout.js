@@ -8,6 +8,8 @@ import { getState, setState, getExplorerUrl } from './state.js';
 import { resolveMultisigAddress } from './resolver.js';
 import { decodeInstruction, KNOWN_PROGRAMS } from './decode.js';
 import { isValidBase58 } from './squads.js';
+import { renderModeToggle, renderOpenBanner } from './ui-lockdown.js';
+import { hasAnyPins } from './pins.js';
 
 // Toast system
 const toastContainer = (() => {
@@ -29,9 +31,15 @@ export function showToast(message, type = 'info') {
 
 // ─── Setup View ───
 
-export function renderSetup(onComplete) {
+export function renderSetup(onComplete, { state, onSwitchMode } = {}) {
   const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const wrapper = el('div', { className: 'setup-wrapper' });
+
+  if (state && onSwitchMode && hasAnyPins()) {
+    const modeBar = el('div', { className: 'setup-mode-bar' });
+    modeBar.appendChild(renderModeToggle(state, onSwitchMode));
+    wrapper.appendChild(modeBar);
+  }
 
 
   // Main content
@@ -153,7 +161,7 @@ function renderSettingsModal(state) {
 
 // ─── Wallet Picker Modal ───
 
-function renderWalletPicker(walletManager) {
+export function renderWalletPicker(walletManager) {
   const overlay = el('div', { className: 'modal-overlay', onclick: () => setState({ showWalletPicker: false }) });
   const modal = el('div', { className: 'modal', onclick: (e) => e.stopPropagation() });
 
@@ -488,7 +496,7 @@ function renderProposalDetail(state, proposalActions, handlers) {
 
 // ─── Main Layout ───
 
-export function renderLayout({ state, walletManager, proposalActions, onConnect, onDisconnect, onRefresh, onLoadMore, onExpandProposal, onApprove, onReject }) {
+export function renderLayout({ state, walletManager, proposalActions, onConnect, onDisconnect, onRefresh, onLoadMore, onExpandProposal, onApprove, onReject, onSwitchMode, onStickyOpenChange, onBackToSquads }) {
   const container = document.createDocumentFragment();
 
   // Header (sticky)
@@ -521,6 +529,8 @@ export function renderLayout({ state, walletManager, proposalActions, onConnect,
 
   const headerRight = el('div', { className: 'header-right' });
 
+  if (onSwitchMode) headerRight.appendChild(renderModeToggle(state, onSwitchMode));
+
   if (state.walletAccount) {
     const walletInfo = walletManager.getWalletInfo();
     const walletBtn = el('button', { className: 'btn btn-sm btn-wallet', onclick: onDisconnect });
@@ -536,16 +546,28 @@ export function renderLayout({ state, walletManager, proposalActions, onConnect,
     }, 'Connect'));
   }
 
-  headerRight.appendChild(el('button', {
-    className: 'btn btn-ghost btn-sm',
-    onclick: () => setState({ multisigAddress: '', multisig: null, proposals: [] }),
-    title: 'Switch multisig',
-  }, '\u2190 Change'));
+  if (state.mode !== 'lockdown') {
+    headerRight.appendChild(el('button', {
+      className: 'btn btn-ghost btn-sm',
+      onclick: () => setState({ multisigAddress: '', multisig: null, proposals: [] }),
+      title: 'Switch multisig',
+    }, '\u2190 Change'));
+  } else {
+    headerRight.appendChild(el('button', {
+      className: 'btn btn-ghost btn-sm',
+      onclick: onBackToSquads,
+      title: 'Back to your squads',
+    }, '\u2190 My Squads'));
+  }
   header.appendChild(headerRight);
   container.appendChild(header);
 
-  // Address bar (always rendered)
-  {
+  if (state.mode === 'open' && hasAnyPins()) {
+    container.appendChild(renderOpenBanner(state, onStickyOpenChange));
+  }
+
+  // Address bar (open mode only — lockdown must not offer arbitrary address entry)
+  if (state.mode !== 'lockdown') {
     const addressBar = el('div', { className: 'address-bar' });
     const addrInput = el('input', {
       className: 'address-bar-input',
