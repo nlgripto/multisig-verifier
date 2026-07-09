@@ -14,6 +14,7 @@ Reads multisig state directly from on-chain accounts, decodes proposal transacti
 - Wallet connect/disconnect via Wallet Standard (Phantom, Solflare, Backpack, etc.)
 - Approve/reject flow with transaction signing, confirmation tracking, and stale-state re-fetch
 - Inline address bar with live base58 validation and multisig switching
+- Lockdown mode: a per-wallet view of explicitly pinned squads, each verified against the on-chain member roster before pinning and re-verified on every load — pinning is refused unless the connected wallet is a member
 - On-chain address resolution: paste a vault address (as shown in the Squads web UI), create key, or proposal/transaction PDA and it resolves to the multisig account — vault matches are confirmed by re-deriving the vault PDA from the candidate multisig
 - Explorer links to Solscan, Solana Explorer, or Helius XRAY
 - Dark/light mode via `prefers-color-scheme`
@@ -45,6 +46,8 @@ squads.asymmetric.re/
 ├── src/
 │   ├── main.js                 # Boot, state wiring, event handlers
 │   ├── state.js                # Frozen immutable state + localStorage persistence
+│   ├── pins.js                 # Per-wallet pin store, membership check, boot-mode selection
+│   ├── ui-lockdown.js          # Lockdown views — squad grid, add-squad flow, mode toggle
 │   ├── rpc.js                  # JSON-RPC fetch wrapper, ALT resolution, batch fetching
 │   ├── squads.js               # Borsh reader, discriminators, PDA derivation, deserialization
 │   ├── crypto.js               # SHA-256 (Web Crypto), Ed25519 curve check, findProgramAddress
