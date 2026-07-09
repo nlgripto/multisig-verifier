@@ -603,6 +603,14 @@ export function renderLayout({ state, walletManager, proposalActions, onConnect,
   }));
   headerLeft.appendChild(el('span', { className: 'logo-text' }, 'Verifier'));
 
+  // Lockdown detail: show the pin's nickname (or shortened address) so the
+  // signer always sees which of their squads they are looking at
+  if (state.mode === 'lockdown' && state.lockdownActive) {
+    const pin = state.pinned.find((p) => p.multisigAddress === state.lockdownActive);
+    headerLeft.appendChild(el('span', { className: 'header-squad-label', title: state.lockdownActive },
+      pin?.label ? sanitize(pin.label) : shortenAddress(state.lockdownActive)));
+  }
+
   // Inline stats in header when multisig is loaded
   if (state.multisig) {
     const headerStats = el('div', { className: 'header-stats' });

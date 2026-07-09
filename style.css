@@ -1555,3 +1555,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .ix-inspect-ok { color: var(--green); }
 .ix-inspect-warn { color: var(--red); }
+
+.header-squad-label {
+  font-size: 13px;
+  color: var(--accent);
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--fg-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
