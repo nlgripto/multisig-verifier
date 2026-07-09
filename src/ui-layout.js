@@ -96,7 +96,7 @@ export function renderSetup(onComplete, { state, onSwitchMode } = {}) {
   card.appendChild(el('p', {}, 'Enter your multisig address to get started.'));
 
   const addressField = el('div', { className: 'field' });
-  addressField.appendChild(el('label', {}, 'Multisig Address'));
+  addressField.appendChild(el('label', {}, 'Multisig address'));
   const addressInput = el('input', { type: 'text', placeholder: 'Enter base58 address...', autofocus: true });
   addressField.appendChild(addressInput);
 
@@ -165,7 +165,7 @@ export function renderWalletPicker(walletManager) {
   const overlay = el('div', { className: 'modal-overlay', onclick: () => setState({ showWalletPicker: false }) });
   const modal = el('div', { className: 'modal', onclick: (e) => e.stopPropagation() });
 
-  modal.appendChild(el('h3', {}, 'Connect Wallet'));
+  modal.appendChild(el('h3', {}, 'Connect wallet'));
 
   const wallets = walletManager.getAvailableWallets();
 
@@ -269,7 +269,7 @@ function renderInstruction(ix, txMessage, ixIndex) {
 
   // Raw hex
   if (ix.data && ix.data.length > 0) {
-    detail.appendChild(el('div', { className: 'ix-raw-label' }, 'Raw Data'));
+    detail.appendChild(el('div', { className: 'ix-raw-label' }, 'Raw data'));
     detail.appendChild(el('div', { className: 'raw-hex' }, toHex(ix.data)));
   }
 
@@ -310,7 +310,7 @@ function renderProposalDetail(state, proposalActions, handlers) {
 
     const progressHeader = el('div', { className: 'approval-header' });
     const progressLeft = el('div', { className: 'approval-header-left' });
-    progressLeft.appendChild(el('div', { className: 'detail-card-title' }, 'Approval Progress'));
+    progressLeft.appendChild(el('div', { className: 'detail-card-title' }, 'Approval progress'));
     const progressRight = el('div', { className: 'approval-header-right' });
     progressRight.appendChild(el('div', { className: 'threshold-count' },
       el('span', { className: 'threshold-current' }, String(approvedCount)),
@@ -424,7 +424,7 @@ function renderProposalDetail(state, proposalActions, handlers) {
   // Config transaction
   if (tx.type === 'config') {
     txCard.appendChild(el('div', { className: 'detail-card-header' },
-      el('div', { className: 'detail-card-title' }, 'Configuration Change'),
+      el('div', { className: 'detail-card-title' }, 'Configuration change'),
     ));
     for (const action of tx.actions) {
       const ixCard = el('div', { className: 'ix-card' });
@@ -485,7 +485,7 @@ function renderProposalDetail(state, proposalActions, handlers) {
   // Unknown transaction type
   if (tx.type === 'unknown') {
     txCard.appendChild(el('div', { className: 'detail-card-header' },
-      el('div', { className: 'detail-card-title' }, 'Unknown Transaction'),
+      el('div', { className: 'detail-card-title' }, 'Unknown transaction'),
     ));
     txCard.appendChild(el('div', { className: 'text-sm text-muted' }, 'Discriminator: ' + tx.discriminator));
     panel.appendChild(txCard);
@@ -557,7 +557,7 @@ export function renderLayout({ state, walletManager, proposalActions, onConnect,
       className: 'btn btn-ghost btn-sm',
       onclick: onBackToSquads,
       title: 'Back to your squads',
-    }, '\u2190 My Squads'));
+    }, '\u2190 My squads'));
   }
   header.appendChild(headerRight);
   container.appendChild(header);
@@ -760,7 +760,7 @@ export function renderLayout({ state, walletManager, proposalActions, onConnect,
           className: 'btn',
           disabled: state.loadingMore,
           onclick: onLoadMore,
-        }, state.loadingMore ? 'Loading...' : 'Load More')
+        }, state.loadingMore ? 'Loading...' : 'Load more')
       ));
     }
   }

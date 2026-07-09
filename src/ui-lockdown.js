@@ -90,7 +90,7 @@ export function renderLockdownHome({ state, walletManager, onAddPin, onUnpin, on
     gate.appendChild(el('button', {
       className: 'btn btn-primary mt-md',
       onclick: () => setState({ showWalletPicker: true }),
-    }, 'Connect Wallet'));
+    }, 'Connect wallet'));
     wrapper.appendChild(gate);
     return wrapper;
   }
@@ -109,7 +109,7 @@ export function renderLockdownHome({ state, walletManager, onAddPin, onUnpin, on
     return wrapper;
   }
 
-  wrapper.appendChild(el('div', { className: 'section-header' }, 'My Squads'));
+  wrapper.appendChild(el('div', { className: 'section-header' }, 'My squads'));
 
   if (state.pinned.length === 0) {
     wrapper.appendChild(el('div', { className: 'empty' },
@@ -187,7 +187,7 @@ function renderAddSquadForm(state, onAddPin) {
     placeholder: 'Nickname (optional)',
   });
   const errorMsg = el('p', { className: 'error-inline' });
-  const addBtn = el('button', { className: 'btn btn-primary' }, 'Verify & Pin');
+  const addBtn = el('button', { className: 'btn btn-primary' }, 'Verify & pin');
 
   let adding = false;
   addBtn.onclick = async () => {
@@ -212,7 +212,7 @@ function renderAddSquadForm(state, onAddPin) {
       adding = false;
       if (document.contains(addBtn)) {
         addBtn.disabled = false;
-        addBtn.textContent = 'Verify & Pin';
+        addBtn.textContent = 'Verify & pin';
       }
     }
   };

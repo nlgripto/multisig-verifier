@@ -32,6 +32,9 @@
   --red-muted: rgba(255, 72, 75, 0.10);
   --blue: #5b9ef0;
   --blue-muted: rgba(91, 158, 240, 0.10);
+  /* AR kit signal green (--ar-success-dk): success / verified states */
+  --green: #3fb950;
+  --green-muted: rgba(63, 185, 80, 0.12);
 
   --radius: 4px;
   --radius-sm: 2px;
@@ -60,6 +63,8 @@
     --fg-secondary: #8d8c8b;
     --fg-muted: #9494a0;
     --fg-faint: rgba(0, 0, 0, 0.06);
+    --green: #38a169;
+    --green-muted: rgba(56, 161, 105, 0.10);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.12);
@@ -87,6 +92,7 @@ body {
   color: var(--fg);
   font-size: 14px;
   line-height: 1.5;
+  letter-spacing: -0.011em; /* AR kit --tracking-tight: always tight, never wide */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -163,14 +169,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   font-size: 11px;
   font-weight: 500;
   color: var(--fg-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 
 .header-stat-value {
   font-family: var(--mono);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--fg);
   font-variant-numeric: tabular-nums;
 }
@@ -224,7 +229,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   font-family: var(--mono);
   font-size: 13.5px;
   color: var(--fg);
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   padding: 14px 0;
   background: none;
   border: none;
@@ -296,7 +301,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .btn-primary {
   background: var(--accent);
   color: #000;
-  font-weight: 600;
+  font-weight: 500;
   box-shadow: 0 2px 8px rgba(61, 214, 140, 0.2);
 }
 .btn-primary:hover {
@@ -345,10 +350,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .section-header {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--fg-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   padding: 0 4px 12px;
   display: flex;
   align-items: center;
@@ -406,7 +410,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .proposal-index {
   font-family: var(--mono);
-  font-weight: 700;
+  font-weight: 500;
   font-size: 15px;
   color: var(--fg);
   min-width: 48px;
@@ -429,8 +433,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: 500;
+  letter-spacing: 0;
   padding: 4px 10px 4px 8px;
   border-radius: 999px;
   background: transparent;
@@ -519,12 +523,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .ix-badge {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 500;
   padding: 3px 8px;
   border-radius: 4px;
   flex-shrink: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 
 .ix-badge.known { background: var(--accent-muted); color: var(--accent); }
@@ -551,10 +554,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .ix-raw-label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--fg-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   margin-top: 14px;
   margin-bottom: 6px;
 }
@@ -594,10 +596,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   text-align: left;
   padding: 8px 10px;
   color: var(--fg-muted);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
 }
 
 .accounts-table td {
@@ -610,8 +611,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   padding: 2px 6px;
   border-radius: 4px;
   margin-left: 4px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .flag-w { background: var(--yellow-muted); color: var(--yellow); }
@@ -653,11 +654,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .detail-card-title {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.01em;
-  text-transform: uppercase;
   color: var(--fg-secondary);
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   font-size: 11px;
 }
 
@@ -666,7 +666,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .threshold-count {
   font-family: var(--mono);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.02em;
 }
 
@@ -750,7 +750,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .member-status-text {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .member-pending .member-status-dot { background: var(--fg-muted); }
@@ -773,11 +773,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .badge-you {
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--accent);
   font-family: var(--font);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   background: var(--accent-muted);
   padding: 2px 6px;
   border-radius: 9999px;
@@ -811,10 +810,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .section-label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--fg-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   margin-top: 28px;
   margin-bottom: 12px;
 }
@@ -882,9 +880,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .setup-brand-badge {
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--accent);
   background: var(--accent-muted);
   border: 1px solid rgba(240, 165, 0, 0.2);
@@ -950,7 +947,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .setup-card h2 {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.03em;
   margin-bottom: 6px;
 }
@@ -997,7 +994,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   background: var(--accent);
   color: #000;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   padding: 13px;
   border-radius: var(--radius);
   border: none;
@@ -1021,11 +1018,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .field label {
   display: block;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 8px;
   color: var(--fg-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
 }
 
 .field input, .field select {
@@ -1104,7 +1100,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .modal h3 {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 24px;
   letter-spacing: -0.02em;
 }
@@ -1162,7 +1158,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   color: var(--fg-muted);
   padding: 0 2px;
   font-family: var(--font);
-  font-weight: 600;
+  font-weight: 500;
   transition: color var(--transition-fast);
 }
 .copy-btn:hover { color: var(--fg-secondary); }
@@ -1354,8 +1350,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .lockdown-badge {
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   color: var(--accent);
   background: var(--accent-muted);
   border: 1px solid var(--accent);
@@ -1410,7 +1405,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .squad-card-label {
-  font-weight: 600;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1433,7 +1428,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   padding: 4px 8px;
   display: inline-block;
 }
-.squad-card-status--member { background: var(--accent-muted); color: var(--accent); }
+.squad-card-status--member { background: var(--green-muted); color: var(--green); }
 .squad-card-status--revoked { background: var(--red-muted); color: var(--red); }
 .squad-card-status--error { background: var(--red-muted); color: var(--red); }
 
