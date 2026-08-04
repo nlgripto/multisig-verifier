@@ -59,6 +59,8 @@ document.addEventListener('visibilitychange', () => {
 // Cross-tab localStorage detection
 window.addEventListener('storage', (e) => {
   if (['multisigAddress', 'pinnedSquads'].includes(e.key)) {
+    const anyActionInProgress = [...proposalActions.values()].some(s => s !== 'idle');
+    if (anyActionInProgress) return;
     showToast('Settings changed in another tab. Reloading...', 'info');
     setTimeout(() => location.reload(), 1500);
   }

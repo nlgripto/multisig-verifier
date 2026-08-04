@@ -56,6 +56,7 @@ const programDataFrozen = cat(u32le(3), u64le(42), new Uint8Array([0]));
 
 let frozenMode = false;
 let rpcCalls = 0;
+const dataSliceByAddress = new Map();
 const accounts = () => new Map([
   [PROG, { owner: UPGRADEABLE_LOADER, executable: true, data: programAccountData }],
   [PROGDATA, { owner: UPGRADEABLE_LOADER, executable: false, data: frozenMode ? programDataFrozen : programDataWithAuthority }],
@@ -68,8 +69,11 @@ globalThis.fetch = async (url, opts = {}) => {
   const { method, params } = JSON.parse(opts.body);
   if (method !== 'getAccountInfo') throw new Error('unexpected method ' + method);
   const acc = accounts().get(params[0]);
+  dataSliceByAddress.set(params[0], params[1]?.dataSlice ?? null);
+  const slice = params[1]?.dataSlice;
+  const data = acc && slice ? acc.data.slice(slice.offset, slice.offset + slice.length) : acc?.data;
   const value = acc
-    ? { owner: acc.owner, executable: acc.executable, lamports: 1, data: [Buffer.from(acc.data).toString('base64'), 'base64'] }
+    ? { owner: acc.owner, executable: acc.executable, lamports: 1, data: [Buffer.from(data).toString('base64'), 'base64'] }
     : null;
   return { ok: true, text: async () => JSON.stringify({ jsonrpc: '2.0', id: 1, result: { value } }) };
 };
@@ -99,6 +103,8 @@ console.log('inspectProgram:');
   assertEq(info.upgradeAuthority, AUTHORITY, 'authority surfaced');
   assertEq(info.slot, '271828182', 'slot surfaced as string');
   assertEq(info.programData, PROGDATA, 'programdata surfaced');
+  const slice = dataSliceByAddress.get(PROGDATA);
+  assert(slice && slice.offset === 0 && slice.length === 45, 'programdata fetched with 45-byte dataSlice, not in full');
 
   const before = rpcCalls;
   await inspectProgram('https://mock', PROG);

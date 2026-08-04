@@ -162,6 +162,42 @@ console.log('Stake:');
   assertEq(wd.action, 'Withdraw', 'withdraw');
 
   assertEq(NATIVE_DECODERS[STAKE](u32le(5), K, [0, 1, 2]).action, 'Deactivate', 'deactivate');
+
+  // SetLockup: args unread (Option fields), authority from accounts
+  const lockup = NATIVE_DECODERS[STAKE](u32le(6), K, [0, 1]);
+  assertEq(lockup.action, 'SetLockup', 'set lockup');
+  assertEq(lockup.severity, 'critical', 'set lockup critical');
+
+  const merge = NATIVE_DECODERS[STAKE](u32le(7), K, [0, 1, 2, 3, 4]);
+  assertEq(merge.action, 'Merge', 'merge');
+  assertEq(merge.details.sourceStake, K[1], 'merge source');
+
+  // AuthorizeWithSeed: new_authorized pubkey + stake_authorize u32 (trailing seed/owner unread)
+  const aws = NATIVE_DECODERS[STAKE](cat(u32le(8), decodeBase58(K[4]), u32le(1)), K, [0, 1, 2]);
+  assertEq(aws.action, 'AuthorizeWithSeed', 'authorize with seed');
+  assertEq(aws.severity, 'critical', 'authorize with seed critical');
+  assertEq(aws.details.newAuthority, K[4], 'aws new authority');
+  assert(aws.description.includes('withdrawer'), 'aws kind named');
+
+  assertEq(NATIVE_DECODERS[STAKE](u32le(9), K, [0, 1, 2, 3]).action, 'InitializeChecked', 'initialize checked');
+
+  // AuthorizeChecked: stake_authorize u32 only; new authority is account 3
+  const ac = NATIVE_DECODERS[STAKE](cat(u32le(10), u32le(1)), K, [0, 1, 2, 3]);
+  assertEq(ac.action, 'AuthorizeChecked', 'authorize checked');
+  assertEq(ac.severity, 'critical', 'authorize checked critical');
+  assertEq(ac.details.newAuthority, K[3], 'ac new authority from accounts');
+
+  const acws = NATIVE_DECODERS[STAKE](cat(u32le(11), u32le(0)), K, [0, 1, 2, 3]);
+  assertEq(acws.action, 'AuthorizeCheckedWithSeed', 'authorize checked with seed');
+  assertEq(acws.severity, 'critical', 'acws critical');
+  assert(acws.description.includes('staker'), 'acws kind named');
+
+  const slc = NATIVE_DECODERS[STAKE](u32le(12), K, [0, 1, 2]);
+  assertEq(slc.action, 'SetLockupChecked', 'set lockup checked');
+  assertEq(slc.severity, 'critical', 'set lockup checked critical');
+
+  // Truly unknown tag still falls through to undecoded
+  assert(NATIVE_DECODERS[STAKE](u32le(99), K, [0]).undecoded, 'unknown tag undecoded');
 }
 
 console.log('Compute budget:');

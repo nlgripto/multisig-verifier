@@ -43,13 +43,16 @@ export function decodeUpgradeableLoaderAccount(data) {
   }
 }
 
-async function fetchAccount(rpcUrl, address) {
+async function fetchAccount(rpcUrl, address, dataSlice) {
   const result = await rpcCall(rpcUrl, 'getAccountInfo', [
     address,
-    { encoding: 'base64', commitment: 'confirmed' },
+    { encoding: 'base64', commitment: 'confirmed', ...(dataSlice ? { dataSlice } : {}) },
   ]);
   return result?.value || null;
 }
+
+// ProgramData header: u32 tag + u64 slot + Option<Pubkey> authority (1 + 32)
+const PROGRAMDATA_HEADER_LEN = 45;
 
 export async function inspectProgram(rpcUrl, programId) {
   if (cache.has(programId)) return cache.get(programId);
@@ -70,7 +73,10 @@ export async function inspectProgram(rpcUrl, programId) {
     if (decoded.tag !== 'program') {
       info = { kind: 'other', owner: account.owner };
     } else {
-      const pdAccount = await fetchAccount(rpcUrl, decoded.programData);
+      const pdAccount = await fetchAccount(rpcUrl, decoded.programData, {
+        offset: 0,
+        length: PROGRAMDATA_HEADER_LEN,
+      });
       if (!pdAccount) throw new Error('programdata account not found: ' + decoded.programData);
       const pd = decodeUpgradeableLoaderAccount(base64ToUint8Array(pdAccount.data[0]));
       if (pd.tag !== 'programdata') throw new Error('unexpected programdata account state: ' + pd.tag);

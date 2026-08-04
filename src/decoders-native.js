@@ -286,6 +286,63 @@ function decodeStake(data, accountKeys, accountIndexes) {
         description: 'Deactivate stake delegation',
         details: { stake: a(0), authority: a(2) },
       };
+    case 6: // SetLockup {LockupArgs: Option fields} — [stake, lockup/withdraw authority]
+      return {
+        action: 'SetLockup',
+        severity: 'critical',
+        description: 'Change stake lockup (expiry and/or custodian)',
+        details: { stake: a(0), authority: a(1) },
+      };
+    case 7: // Merge — [dest stake, source stake, clock, stake_history, authority]
+      return {
+        action: 'Merge',
+        description: 'Merge source stake account into destination',
+        details: { destinationStake: a(0), sourceStake: a(1), authority: a(4) },
+      };
+    case 8: { // AuthorizeWithSeed {new_authorized, stake_authorize u32, seed, owner} — [stake, authority base, clock, (custodian)]
+      const newAuthority = reader.readPubkeyBase58();
+      const kindTag = reader.readU32();
+      const kind = kindTag === 0 ? 'staker' : kindTag === 1 ? 'withdrawer' : `authority (unknown kind ${kindTag})`;
+      return {
+        action: 'AuthorizeWithSeed',
+        severity: 'critical',
+        description: `Change stake ${kind} authority (seeded current authority)`,
+        details: { stake: a(0), authorityKind: kind, authorityBase: a(1), newAuthority },
+      };
+    }
+    case 9: // InitializeChecked — [stake, rent, staker, withdrawer (signer)]
+      return {
+        action: 'InitializeChecked',
+        description: 'Initialize stake account (withdrawer co-signs)',
+        details: { stake: a(0), staker: a(2), withdrawer: a(3) },
+      };
+    case 10: { // AuthorizeChecked {stake_authorize u32} — [stake, clock, current authority, new authority (signer), (custodian)]
+      const kindTag = reader.readU32();
+      const kind = kindTag === 0 ? 'staker' : kindTag === 1 ? 'withdrawer' : `authority (unknown kind ${kindTag})`;
+      return {
+        action: 'AuthorizeChecked',
+        severity: 'critical',
+        description: `Change stake ${kind} authority (new authority must co-sign)`,
+        details: { stake: a(0), authorityKind: kind, currentAuthority: a(2), newAuthority: a(3) },
+      };
+    }
+    case 11: { // AuthorizeCheckedWithSeed {stake_authorize u32, seed, owner} — [stake, authority base, clock, new authority (signer), (custodian)]
+      const kindTag = reader.readU32();
+      const kind = kindTag === 0 ? 'staker' : kindTag === 1 ? 'withdrawer' : `authority (unknown kind ${kindTag})`;
+      return {
+        action: 'AuthorizeCheckedWithSeed',
+        severity: 'critical',
+        description: `Change stake ${kind} authority (seeded current authority, new authority must co-sign)`,
+        details: { stake: a(0), authorityKind: kind, authorityBase: a(1), newAuthority: a(3) },
+      };
+    }
+    case 12: // SetLockupChecked {Option fields} — [stake, authority, (new custodian signer)]
+      return {
+        action: 'SetLockupChecked',
+        severity: 'critical',
+        description: 'Change stake lockup (new custodian co-signs if changing)',
+        details: { stake: a(0), authority: a(1) },
+      };
     default:
       return {
         action: 'Unknown stake instruction',
